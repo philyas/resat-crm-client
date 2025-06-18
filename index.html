@@ -480,7 +480,7 @@
                 loadingModal.classList.add('show');
                 
                 try {
-                    const response = await fetch('http://localhost:3000/tasks', {
+                    const response = await fetch('https://resat-videos-backend.onrender.com/tasks', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -522,7 +522,7 @@
             const projectInfoEl = document.getElementById('projectInfo');
             
             try {
-                const response = await fetch(`http://localhost:3000/projects/${projectGid}`);
+                const response = await fetch(`https://resat-videos-backend.onrender.com/projects/${projectGid}`);
                 
                 if (!response.ok) {
                     throw new Error('Failed to fetch project');
@@ -542,7 +542,7 @@
             const tasksContainer = document.getElementById('tasksContainer');
             
             try {
-                const response = await fetch(`http://localhost:3000/tasks/${projectGid}`);
+                const response = await fetch(`https://resat-videos-backend.onrender.com/tasks/${projectGid}`);
                 
                 if (!response.ok) {
                     throw new Error('Failed to fetch tasks');
