@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asana Project Dashboard</title>
+    <style>
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f5f7fa;
+            --text-primary: #2d3748;
+            --text-secondary: #4a5568;
+            --accent: #4f46e5;
+            --accent-hover: #4338ca;
+            --border: #e2e8f0;
+            --card-bg: #ffffff;
+            --input-bg: #ffffff;
+            --success: #10b981;
+            --error: #ef4444;
+            --warning: #f59e0b;
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #1a202c;
+            --bg-secondary: #2d3748;
+            --text-primary: #f7fafc;
+            --text-secondary: #cbd5e0;
+            --accent: #6366f1;
+            --accent-hover: #818cf8;
+            --border: #4a5568;
+            --card-bg: #2d3748;
+            --input-bg: #4a5568;
+            --success: #34d399;
+            --error: #f87171;
+            --warning: #fbbf24;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+        }
+
+        .theme-toggle:hover {
+            background-color: var(--bg-secondary);
+        }
+
+        .project-info {
+            background-color: var(--card-bg);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border);
+        }
+
+        .project-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .project-icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 0.5rem;
+            background-color: var(--accent);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-weight: bold;
+        }
+
+        .project-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .project-meta {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            flex-wrap: wrap;
+        }
+
+        .project-description {
+            margin-top: 1rem;
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .tasks-container {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .task-card {
+            background-color: var(--card-bg);
+            border-radius: 0.75rem;
+            padding: 1.25rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .task-name {
+            font-weight: 600;
+            margin: 0;
+            flex-grow: 1;
+        }
+
+        .task-id {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            background-color: var(--bg-secondary);
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.5rem;
+        }
+
+        .task-notes {
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .task-meta {
+            display: flex;
+            gap: 0.75rem;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            flex-wrap: wrap;
+        }
+
+        .task-status {
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            background-color: var(--bg-secondary);
+        }
+
+        .completed {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .in-progress {
+            background-color: var(--accent);
+            color: white;
+        }
+
+        .new-task-form {
+            background-color: var(--card-bg);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border);
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+            background-color: var(--input-bg);
+            color: var(--text-primary);
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        button {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: var(--accent-hover);
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+        }
+
+        .spinner {
+            width: 2rem;
+            height: 2rem;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--accent);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            color: var(--error);
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .task-action-btn {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.8rem;
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+        }
+
+        .task-action-btn:hover {
+            background-color: var(--accent);
+            color: white;
+        }
+
+        /* Loading Modal Styles */
+        .loading-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .loading-modal.show {
+            display: flex;
+        }
+
+        .loading-modal-content {
+            background-color: var(--card-bg);
+            border-radius: 0.75rem;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border);
+        }
+
+        .loading-modal-spinner {
+            width: 3rem;
+            height: 3rem;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--accent);
+            animation: spin 1s ease-in-out infinite;
+            margin: 0 auto 1rem;
+        }
+
+        .loading-modal-text {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .project-meta {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .task-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .task-id {
+                align-self: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Project Dashboard</h1>
+            <button class="theme-toggle" id="themeToggle">
+                <span id="themeIcon">🌙</span>
+            </button>
+        </header>
+
+        <div id="projectInfo" class="project-info">
+            <div class="loading">
+                <div class="spinner"></div>
+            </div>
+        </div>
+
+        <div class="new-task-form">
+            <h2 class="section-title">Create New Task</h2>
+            <form id="taskForm">
+                <div class="form-group">
+                    <label for="taskName">Task Name</label>
+                    <input type="text" id="taskName" required>
+                </div>
+                <div class="form-group">
+                    <label for="taskNotes">Description</label>
+                    <textarea id="taskNotes"></textarea>
+                </div>
+                <button type="submit">Create Task</button>
+                <div id="formError" class="error-message"></div>
+            </form>
+        </div>
+
+        <div class="tasks-section">
+            <h2 class="section-title">Tasks</h2>
+            <div id="tasksContainer" class="tasks-container">
+                <div class="loading">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Modal -->
+    <div id="loadingModal" class="loading-modal">
+        <div class="loading-modal-content">
+            <div class="loading-modal-spinner"></div>
+            <div class="loading-modal-text">Creating task...</div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Theme toggle functionality
+            const themeToggle = document.getElementById('themeToggle');
+            const themeIcon = document.getElementById('themeIcon');
+            
+            // Function to get current theme
+            function getCurrentTheme() {
+                return localStorage.getItem('theme') || 'light';
+            }
+            
+            // Function to update theme
+            function updateTheme(theme) {
+                document.documentElement.setAttribute('data-theme', theme);
+                localStorage.setItem('theme', theme);
+                themeIcon.textContent = theme === 'dark' ? '☀️' : '🌙';
+            }
+            
+            // Initialize theme
+            updateTheme(getCurrentTheme());
+            
+            themeToggle.addEventListener('click', () => {
+                const currentTheme = getCurrentTheme();
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                updateTheme(newTheme);
+            });
+
+            // Get project ID from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            let projectGid = urlParams.get('projectGid');
+            
+            // If no projectGid in URL, check for hash (for simpler URLs)
+            if (!projectGid && window.location.hash) {
+                projectGid = window.location.hash.substring(1);
+            }
+            
+            if (!projectGid) {
+                renderError("No project ID specified. Please add ?projectGid=YOUR_PROJECT_ID to the URL");
+                return;
+            }
+
+            // Fetch project and tasks
+            fetchProject(projectGid);
+            fetchTasks(projectGid);
+
+            // Handle task form submission
+            const taskForm = document.getElementById('taskForm');
+            const loadingModal = document.getElementById('loadingModal');
+            
+            taskForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const taskName = document.getElementById('taskName').value;
+                const taskNotes = document.getElementById('taskNotes').value;
+                const formError = document.getElementById('formError');
+                
+                formError.textContent = '';
+                
+                // Show loading modal
+                loadingModal.classList.add('show');
+                
+                try {
+                    const response = await fetch('http://localhost:3000/tasks', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            name: taskName,
+                            notes: taskNotes,
+                            projectGid: projectGid
+                        })
+                    });
+                    
+                    if (!response.ok) {
+                        const error = await response.json();
+                        throw new Error(error.error?.message || 'Failed to create task');
+                    }
+                    
+                    const task = await response.json();
+                    renderTask(task);
+                    taskForm.reset();
+                    
+                    // Show success feedback
+                    const submitBtn = taskForm.querySelector('button[type="submit"]');
+                    const originalText = submitBtn.textContent;
+                    submitBtn.textContent = 'Task Created!';
+                    setTimeout(() => {
+                        submitBtn.textContent = originalText;
+                    }, 2000);
+                    
+                } catch (error) {
+                    formError.textContent = error.message;
+                } finally {
+                    // Hide loading modal
+                    loadingModal.classList.remove('show');
+                }
+            });
+        });
+
+        async function fetchProject(projectGid) {
+            const projectInfoEl = document.getElementById('projectInfo');
+            
+            try {
+                const response = await fetch(`http://localhost:3000/projects/${projectGid}`);
+                
+                if (!response.ok) {
+                    throw new Error('Failed to fetch project');
+                }
+                
+                const project = await response.json();
+                renderProject(project.data);
+                
+            } catch (error) {
+                projectInfoEl.innerHTML = `
+                    <div class="error-message">Error loading project: ${error.message}</div>
+                `;
+            }
+        }
+
+        async function fetchTasks(projectGid) {
+            const tasksContainer = document.getElementById('tasksContainer');
+            
+            try {
+                const response = await fetch(`http://localhost:3000/tasks/${projectGid}`);
+                
+                if (!response.ok) {
+                    throw new Error('Failed to fetch tasks');
+                }
+                
+                const tasks = await response.json();
+                
+                if (!tasks || tasks.length === 0) {
+                    tasksContainer.innerHTML = `
+                        <div class="empty-state">
+                            No tasks found for this project. Create one above!
+                        </div>
+                    `;
+                    return;
+                }
+                
+                tasksContainer.innerHTML = '';
+                tasks.forEach(task => renderTask(task));
+                
+            } catch (error) {
+                tasksContainer.innerHTML = `
+                    <div class="error-message">Error loading tasks: ${error.message}</div>
+                `;
+            }
+        }
+
+        function renderProject(project) {
+            const projectInfoEl = document.getElementById('projectInfo');
+            
+            // Format dates
+            const createdAt = project.created_at ? new Date(project.created_at).toLocaleDateString() : 'Unknown';
+            const modifiedAt = project.modified_at ? new Date(project.modified_at).toLocaleDateString() : 'Unknown';
+            
+            projectInfoEl.innerHTML = `
+                <div class="project-header">
+                    <div class="project-icon">${project.name.charAt(0).toUpperCase()}</div>
+                    <div>
+                        <h2 class="project-title">${project.name}</h2>
+                        <div class="project-meta">
+                            <span>Created: ${createdAt}</span>
+                            <span>Last Modified: ${modifiedAt}</span>
+                            <span>Status: ${project.current_status?.title || 'No status'}</span>
+                            <span>Project ID: ${project.gid || 'N/A'}</span>
+                        </div>
+                    </div>
+                </div>
+                ${project.notes ? `<div class="project-description">${project.notes}</div>` : ''}
+            `;
+            
+            // Update page title
+            document.title = `${project.name} | Asana Dashboard`;
+        }
+
+        function renderTask(task) {
+            const tasksContainer = document.getElementById('tasksContainer');
+            
+            // Remove loading spinner if present
+            if (tasksContainer.querySelector('.loading')) {
+                tasksContainer.innerHTML = '';
+            }
+            
+            // Shorten the task ID for display
+            const shortId = task.gid ? task.gid.slice(-6) : '';
+            
+            const taskEl = document.createElement('div');
+            taskEl.className = 'task-card';
+            taskEl.innerHTML = `
+                <div class="task-header">
+                    <h3 class="task-name">${task.name}</h3>
+                    <span class="task-id">#${shortId}</span>
+                </div>
+                ${task.notes ? `<div class="task-notes">${task.notes}</div>` : ''}
+                <div class="task-meta">
+                    <span class="task-status in-progress">In Progress</span>
+                    <span>Type: ${task.resource_subtype || 'Task'}</span>
+                </div>
+                <div class="task-actions">
+                    <button class="task-action-btn">View Details</button>
+                    <button class="task-action-btn">Edit</button>
+                </div>
+            `;
+            
+            tasksContainer.appendChild(taskEl);
+        }
+
+        function renderError(message) {
+            const container = document.querySelector('.container');
+            container.innerHTML = `
+                <div class="error-message" style="text-align: center; margin-top: 2rem;">
+                    ${message}
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
