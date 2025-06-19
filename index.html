@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resat Videos - Project Dashboard</title>
+    <title>Resat Videos - Kundenportal</title>
     <style>
         :root {
             --bg-primary: #ffffff;
@@ -493,6 +493,43 @@
                 align-self: flex-start;
             }
         }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-left: 0.5rem;
+        }
+
+        .status-on-track {
+            background-color: #10b981;
+            color: white;
+        }
+
+        .status-at-risk {
+            background-color: #f59e0b;
+            color: white;
+        }
+
+        .status-off-track {
+            background-color: #ef4444;
+            color: white;
+        }
+
+        .status-on-hold {
+            background-color: #6b7280;
+            color: white;
+        }
+
+        .status-unknown {
+            background-color: #9ca3af;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -502,7 +539,7 @@
                 <img src="assets/resat-crm-logo.png" alt="Resat CRM Logo" class="resat-crm-logo">
             </div>
             <div class="header-center">
-                <h1>Resat Videos - Project Dashboard</h1>
+                <h1>Resat Videos - Projektportal</h1>
             </div>
             <div class="header-right">
                 <button class="theme-toggle" id="themeToggle">
@@ -759,7 +796,31 @@
             // Format dates
             const createdAt = project.created_at ? new Date(project.created_at).toLocaleDateString() : 'Unknown';
             const modifiedAt = project.modified_at ? new Date(project.modified_at).toLocaleDateString() : 'Unknown';
+
+            console.log(project);
+
+            // current_status_update.status_type → on_track, at_risk, off_track, on_hold
+            let cuurentStatus = project.current_status_update.status_type;
+            let statusBadgeClass = 'status-unknown';
             
+            if (cuurentStatus === 'on_track') {
+                cuurentStatus = 'Planmäßig';
+                statusBadgeClass = 'status-on-track';
+            } else if (cuurentStatus === 'at_risk') {
+                cuurentStatus = 'Gefährdet';
+                statusBadgeClass = 'status-at-risk';
+            } else if (cuurentStatus === 'off_track') {
+                cuurentStatus = 'Unplanmäßig';
+                statusBadgeClass = 'status-off-track';
+            } else if (cuurentStatus === 'on_hold') {
+                cuurentStatus = 'Zurückgestellt';
+                statusBadgeClass = 'status-on-hold';
+            } else {
+                cuurentStatus = 'No Status';
+                statusBadgeClass = 'status-unknown';
+            }
+
+        
             projectInfoEl.innerHTML = `
                 <div class="project-header">
                     <div class="project-icon">${project.name.charAt(0).toUpperCase()}</div>
@@ -768,7 +829,7 @@
                         <div class="project-meta">
                             <span>Created: ${createdAt}</span>
                             <span>Last Modified: ${modifiedAt}</span>
-                            <span>Status: ${project.current_status?.title || 'No status'}</span>
+                            <span>Status: <span class="status-badge ${statusBadgeClass}">${cuurentStatus}</span></span>
                             <span>Project ID: ${project.gid || 'N/A'}</span>
                         </div>
                     </div>
