@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Asana Project Dashboard</title>
+    <title>Resat Videos - Project Dashboard</title>
     <style>
         :root {
             --bg-primary: #ffffff;
@@ -18,6 +18,8 @@
             --success: #10b981;
             --error: #ef4444;
             --warning: #f59e0b;
+            --navy: #02195be0;
+            --navy-hover: #1e40af;
         }
 
         [data-theme="dark"] {
@@ -33,6 +35,8 @@
             --success: #34d399;
             --error: #f87171;
             --warning: #fbbf24;
+            --navy: #1e40af;
+            --navy-hover: #1e3a8a;
         }
 
         * {
@@ -62,6 +66,29 @@
             margin-bottom: 2rem;
             padding-bottom: 1rem;
             border-bottom: 1px solid var(--border);
+            position: relative;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .resat-crm-logo {
+            height: 40px;
+            width: auto;
+            margin-right: 1rem;
+        }
+
+        .header-center {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
         }
 
         h1 {
@@ -77,10 +104,23 @@
             font-size: 1.2rem;
             padding: 0.5rem;
             border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .theme-toggle:hover {
             background-color: var(--bg-secondary);
+        }
+
+        .theme-icon {
+            width: 1.2rem;
+            height: 1.2rem;
+            transition: transform 0.2s ease;
+        }
+
+        .theme-toggle:hover .theme-icon {
+            transform: scale(1.1);
         }
 
         .project-info {
@@ -102,7 +142,7 @@
             width: 2.5rem;
             height: 2.5rem;
             border-radius: 0.5rem;
-            background-color: var(--accent);
+            background-color: var(--navy);
             color: white;
             display: flex;
             align-items: center;
@@ -321,6 +361,24 @@
             background-color: var(--accent-hover);
         }
 
+        .navy-button {
+            background-color: var(--navy);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(30, 58, 138, 0.3);
+        }
+
+        .navy-button:hover {
+            background-color: var(--navy-hover);
+            box-shadow: 0 4px 8px rgba(30, 58, 138, 0.4);
+            transform: translateY(-1px);
+        }
+
         .loading {
             display: flex;
             justify-content: center;
@@ -440,10 +498,27 @@
 <body>
     <div class="container">
         <header>
-            <h1>Project Dashboard</h1>
-            <button class="theme-toggle" id="themeToggle">
-                <span id="themeIcon">🌙</span>
-            </button>
+            <div class="header-left">
+                <img src="assets/resat-crm-logo.png" alt="Resat CRM Logo" class="resat-crm-logo">
+            </div>
+            <div class="header-center">
+                <h1>Resat Videos - Project Dashboard</h1>
+            </div>
+            <div class="header-right">
+                <button class="theme-toggle" id="themeToggle">
+                    <svg class="theme-icon" id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
         </header>
 
         <div id="projectInfo" class="project-info">
@@ -463,7 +538,7 @@
                     <label for="taskNotes">Description</label>
                     <textarea id="taskNotes"></textarea>
                 </div>
-                <button type="submit">Send Request</button>
+                <button type="submit" class="navy-button">Send Request</button>
                 <div id="formError" class="error-message"></div>
             </form>
         </div>
@@ -471,9 +546,9 @@
         <div class="tasks-section">
             <div class="section-header" id="requestsHeader">
                 <h2 class="section-title">My Requests</h2>
-                <button class="section-toggle" id="requestsToggle">▼</button>
+                <button class="section-toggle collapsed" id="requestsToggle">▶</button>
             </div>
-            <div id="tasksContainer" class="tasks-container collapsible-content">
+            <div id="tasksContainer" class="tasks-container collapsible-content collapsed">
                 <div class="loading">
                     <div class="spinner"></div>
                 </div>
@@ -504,7 +579,24 @@
             function updateTheme(theme) {
                 document.documentElement.setAttribute('data-theme', theme);
                 localStorage.setItem('theme', theme);
-                themeIcon.textContent = theme === 'dark' ? '☀️' : '🌙';
+                
+                const sunIcon = `<svg class="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="5"></circle>
+                    <line x1="12" y1="1" x2="12" y2="3"></line>
+                    <line x1="12" y1="21" x2="12" y2="23"></line>
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                    <line x1="1" y1="12" x2="3" y2="12"></line>
+                    <line x1="21" y1="12" x2="23" y2="12"></line>
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                </svg>`;
+                
+                const moonIcon = `<svg class="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                </svg>`;
+                
+                themeIcon.innerHTML = theme === 'dark' ? sunIcon : moonIcon;
             }
             
             // Initialize theme
