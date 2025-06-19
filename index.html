@@ -137,6 +137,48 @@
             margin-bottom: 1rem;
         }
 
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .section-header:hover {
+            opacity: 0.8;
+        }
+
+        .section-toggle {
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            transition: transform 0.2s ease;
+        }
+
+        .section-toggle:hover {
+            background-color: var(--bg-secondary);
+        }
+
+        .section-toggle.collapsed {
+            transform: rotate(-90deg);
+        }
+
+        .collapsible-content {
+            transition: max-height 0.3s ease, opacity 0.3s ease;
+            overflow: hidden;
+        }
+
+        .collapsible-content.collapsed {
+            max-height: 0;
+            opacity: 0;
+        }
+
         .tasks-container {
             display: grid;
             gap: 1rem;
@@ -202,6 +244,32 @@
 
         .in-progress {
             background-color: var(--accent);
+            color: white;
+        }
+
+        .new-task {
+            background-color: var(--warning);
+            color: white;
+        }
+
+        /* Specific status colors for German section names */
+        .status-todo {
+            background-color: #f59e0b; /* Orange for "To-do" */
+            color: white;
+        }
+
+        .status-in-bearbeitung {
+            background-color: #3b82f6; /* Blue for "In Bearbeitung" */
+            color: white;
+        }
+
+        .status-fertig {
+            background-color: #10b981; /* Green for "Fertig" */
+            color: white;
+        }
+
+        .status-unbenannter-abschnitt {
+            background-color: #6b7280; /* Gray for "Unbenannter Abschnitt" */
             color: white;
         }
 
@@ -385,24 +453,27 @@
         </div>
 
         <div class="new-task-form">
-            <h2 class="section-title">Create New Task</h2>
+            <h2 class="section-title">Create Request</h2>
             <form id="taskForm">
                 <div class="form-group">
-                    <label for="taskName">Task Name</label>
+                    <label for="taskName">Title</label>
                     <input type="text" id="taskName" required>
                 </div>
                 <div class="form-group">
                     <label for="taskNotes">Description</label>
                     <textarea id="taskNotes"></textarea>
                 </div>
-                <button type="submit">Create Task</button>
+                <button type="submit">Send Request</button>
                 <div id="formError" class="error-message"></div>
             </form>
         </div>
 
         <div class="tasks-section">
-            <h2 class="section-title">Tasks</h2>
-            <div id="tasksContainer" class="tasks-container">
+            <div class="section-header" id="requestsHeader">
+                <h2 class="section-title">My Requests</h2>
+                <button class="section-toggle" id="requestsToggle">▼</button>
+            </div>
+            <div id="tasksContainer" class="tasks-container collapsible-content">
                 <div class="loading">
                     <div class="spinner"></div>
                 </div>
@@ -466,6 +537,27 @@
             // Handle task form submission
             const taskForm = document.getElementById('taskForm');
             const loadingModal = document.getElementById('loadingModal');
+            
+            // Handle collapsible requests section
+            const requestsHeader = document.getElementById('requestsHeader');
+            const requestsToggle = document.getElementById('requestsToggle');
+            const tasksContainer = document.getElementById('tasksContainer');
+            
+            requestsHeader.addEventListener('click', () => {
+                const isCollapsed = tasksContainer.classList.contains('collapsed');
+                
+                if (isCollapsed) {
+                    // Expand
+                    tasksContainer.classList.remove('collapsed');
+                    requestsToggle.classList.remove('collapsed');
+                    requestsToggle.textContent = '▼';
+                } else {
+                    // Collapse
+                    tasksContainer.classList.add('collapsed');
+                    requestsToggle.classList.add('collapsed');
+                    requestsToggle.textContent = '▶';
+                }
+            });
             
             taskForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
@@ -607,6 +699,29 @@
             // Shorten the task ID for display
             const shortId = task.gid ? task.gid.slice(-6) : '';
             
+            // Get the section name from memberships (this is the actual status)
+            const sectionName = task.memberships && task.memberships.length > 0 
+                ? task.memberships[0].section.name 
+                : 'No Status';
+            
+            // Determine status class based on section name only
+            let statusClass = 'in-progress';
+            
+            // Check section name for color assignment
+            if (sectionName === 'To-do') {
+                statusClass = 'status-todo';
+            } else if (sectionName === 'In Bearbeitung') {
+                statusClass = 'status-in-bearbeitung';
+            } else if (sectionName === 'Fertig') {
+                statusClass = 'status-fertig';
+            } else if (sectionName === 'Unbenannter Abschnitt') {
+                statusClass = 'status-unbenannter-abschnitt';
+            } else if (sectionName.toLowerCase().includes('fertig') || sectionName.toLowerCase().includes('done')) {
+                statusClass = 'status-fertig';
+            } else if (sectionName.toLowerCase().includes('todo') || sectionName.toLowerCase().includes('to-do')) {
+                statusClass = 'status-todo';
+            }
+            
             const taskEl = document.createElement('div');
             taskEl.className = 'task-card';
             taskEl.innerHTML = `
@@ -616,8 +731,9 @@
                 </div>
                 ${task.notes ? `<div class="task-notes">${task.notes}</div>` : ''}
                 <div class="task-meta">
-                    <span class="task-status in-progress">In Progress</span>
+                    <span class="task-status ${statusClass}">${sectionName}</span>
                     <span>Type: ${task.resource_subtype || 'Task'}</span>
+                    ${task.due_on ? `<span>Due: ${task.due_on}</span>` : ''}
                 </div>
                 <div class="task-actions">
                     <button class="task-action-btn">View Details</button>
