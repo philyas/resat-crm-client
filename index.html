@@ -530,6 +530,84 @@
             background-color: #9ca3af;
             color: white;
         }
+
+        /* Notification Modal Styles */
+        .notification-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .notification-modal.show {
+            display: flex;
+        }
+
+        .notification-modal-content {
+            background-color: var(--card-bg);
+            border-radius: 0.75rem;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border);
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .notification-icon {
+            width: 3rem;
+            height: 3rem;
+            margin: 0 auto 1rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .notification-icon.success {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .notification-icon.error {
+            background-color: var(--error);
+            color: white;
+        }
+
+        .notification-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .notification-message {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
+
+        .notification-button {
+            background-color: var(--navy);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .notification-button:hover {
+            background-color: var(--navy-hover);
+        }
     </style>
 </head>
 <body>
@@ -598,6 +676,16 @@
         <div class="loading-modal-content">
             <div class="loading-modal-spinner"></div>
             <div class="loading-modal-text">Creating task...</div>
+        </div>
+    </div>
+
+    <!-- Notification Modal -->
+    <div id="notificationModal" class="notification-modal">
+        <div class="notification-modal-content">
+            <div class="notification-icon" id="notificationIcon">✓</div>
+            <h3 class="notification-title" id="notificationTitle">Success</h3>
+            <p class="notification-message" id="notificationMessage">Your request has been created successfully!</p>
+            <button class="notification-button" id="notificationButton">OK</button>
         </div>
     </div>
 
@@ -672,6 +760,40 @@
             const requestsToggle = document.getElementById('requestsToggle');
             const tasksContainer = document.getElementById('tasksContainer');
             
+            // Handle notification modal
+            const notificationModal = document.getElementById('notificationModal');
+            const notificationIcon = document.getElementById('notificationIcon');
+            const notificationTitle = document.getElementById('notificationTitle');
+            const notificationMessage = document.getElementById('notificationMessage');
+            const notificationButton = document.getElementById('notificationButton');
+            
+            function showNotification(type, title, message) {
+                notificationIcon.className = `notification-icon ${type}`;
+                notificationTitle.textContent = title;
+                notificationMessage.textContent = message;
+                
+                if (type === 'success') {
+                    notificationIcon.textContent = '✓';
+                } else {
+                    notificationIcon.textContent = '✕';
+                }
+                
+                notificationModal.classList.add('show');
+            }
+            
+            function hideNotification() {
+                notificationModal.classList.remove('show');
+            }
+            
+            notificationButton.addEventListener('click', hideNotification);
+            
+            // Close modal when clicking outside
+            notificationModal.addEventListener('click', (e) => {
+                if (e.target === notificationModal) {
+                    hideNotification();
+                }
+            });
+            
             requestsHeader.addEventListener('click', () => {
                 const isCollapsed = tasksContainer.classList.contains('collapsed');
                 
@@ -722,16 +844,12 @@
                     renderTask(task);
                     taskForm.reset();
                     
-                    // Show success feedback
-                    const submitBtn = taskForm.querySelector('button[type="submit"]');
-                    const originalText = submitBtn.textContent;
-                    submitBtn.textContent = 'Task Created!';
-                    setTimeout(() => {
-                        submitBtn.textContent = originalText;
-                    }, 2000);
+                    // Show success notification
+                    showNotification('success', 'Request Created!', 'Your request has been successfully created and added to the project.');
                     
                 } catch (error) {
-                    formError.textContent = error.message;
+                    // Show error notification
+                    showNotification('error', 'Error Creating Request', error.message || 'An unexpected error occurred while creating your request.');
                 } finally {
                     // Hide loading modal
                     loadingModal.classList.remove('show');
@@ -800,7 +918,7 @@
             console.log(project);
 
             // current_status_update.status_type → on_track, at_risk, off_track, on_hold
-            let cuurentStatus = project.current_status_update.status_type;
+            let cuurentStatus = project.current_status_update?.status_type || 'unknown';
             let statusBadgeClass = 'status-unknown';
             
             if (cuurentStatus === 'on_track') {
