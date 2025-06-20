@@ -158,11 +158,11 @@
 
         .project-meta {
             display: flex;
-            gap: 1rem;
+            flex-direction: column;
+            gap: 0.5rem;
             margin-top: 0.5rem;
             color: var(--text-secondary);
             font-size: 0.9rem;
-            flex-wrap: wrap;
         }
 
         .project-description {
@@ -914,27 +914,28 @@
             // Format dates
             const createdAt = project.created_at ? new Date(project.created_at).toLocaleDateString() : 'Unknown';
             const modifiedAt = project.modified_at ? new Date(project.modified_at).toLocaleDateString() : 'Unknown';
+            const dueDate = project.due_date ? new Date(project.due_date).toLocaleDateString() : null;
 
             console.log(project);
 
             // current_status_update.status_type → on_track, at_risk, off_track, on_hold
-            let cuurentStatus = project.current_status_update?.status_type || 'unknown';
+            let currentStatus = project.current_status_update?.status_type || 'unknown';
             let statusBadgeClass = 'status-unknown';
             
-            if (cuurentStatus === 'on_track') {
-                cuurentStatus = 'Planmäßig';
+            if (currentStatus === 'on_track') {
+                currentStatus = 'Planmäßig';
                 statusBadgeClass = 'status-on-track';
-            } else if (cuurentStatus === 'at_risk') {
-                cuurentStatus = 'Gefährdet';
+            } else if (currentStatus === 'at_risk') {
+                currentStatus = 'Gefährdet';
                 statusBadgeClass = 'status-at-risk';
-            } else if (cuurentStatus === 'off_track') {
-                cuurentStatus = 'Unplanmäßig';
+            } else if (currentStatus === 'off_track') {
+                currentStatus = 'Unplanmäßig';
                 statusBadgeClass = 'status-off-track';
-            } else if (cuurentStatus === 'on_hold') {
-                cuurentStatus = 'Zurückgestellt';
+            } else if (currentStatus === 'on_hold') {
+                currentStatus = 'Zurückgestellt';
                 statusBadgeClass = 'status-on-hold';
             } else {
-                cuurentStatus = 'No Status';
+                currentStatus = 'No Status';
                 statusBadgeClass = 'status-unknown';
             }
 
@@ -947,7 +948,8 @@
                         <div class="project-meta">
                             <span>Created: ${createdAt}</span>
                             <span>Last Modified: ${modifiedAt}</span>
-                            <span>Status: <span class="status-badge ${statusBadgeClass}">${cuurentStatus}</span></span>
+                            ${dueDate ? `<span>Due Date: ${dueDate}</span>` : ''}
+                            <span>Status: <span class="status-badge ${statusBadgeClass}">${currentStatus}</span></span>
                             <span>Project ID: ${project.gid || 'N/A'}</span>
                         </div>
                     </div>
