@@ -160,6 +160,146 @@
             box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
         }
 
+        /* Mobile Burger Menu */
+        .burger-menu {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s;
+        }
+
+        .burger-menu:hover {
+            background-color: var(--bg-secondary);
+        }
+
+        .burger-line {
+            width: 20px;
+            height: 2px;
+            background-color: var(--text-primary);
+            margin: 2px 0;
+            transition: 0.3s;
+        }
+
+        .burger-menu.active .burger-line:nth-child(1) {
+            transform: rotate(-45deg) translate(-5px, 6px);
+        }
+
+        .burger-menu.active .burger-line:nth-child(2) {
+            opacity: 0;
+        }
+
+        .burger-menu.active .burger-line:nth-child(3) {
+            transform: rotate(45deg) translate(-5px, -6px);
+        }
+
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            right: -300px;
+            width: 280px;
+            height: 100vh;
+            background-color: var(--card-bg);
+            border-left: 1px solid var(--border);
+            box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+            transition: right 0.3s ease;
+            z-index: 1000;
+            padding: 2rem 1.5rem;
+            overflow-y: auto;
+        }
+
+        .mobile-menu.show {
+            right: 0;
+        }
+
+        .mobile-menu-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .mobile-menu-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .mobile-menu-close {
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s;
+        }
+
+        .mobile-menu-close:hover {
+            background-color: var(--bg-secondary);
+        }
+
+        .mobile-menu-section {
+            margin-bottom: 2rem;
+        }
+
+        .mobile-menu-section-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 1rem;
+        }
+
+        .mobile-menu-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+            transition: background-color 0.2s;
+            cursor: pointer;
+        }
+
+        .mobile-menu-item:hover {
+            background-color: var(--bg-secondary);
+        }
+
+        .mobile-menu-item-icon {
+            width: 1.5rem;
+            height: 1.5rem;
+            margin-right: 1rem;
+            color: var(--text-secondary);
+        }
+
+        .mobile-menu-item-text {
+            flex: 1;
+            color: var(--text-primary);
+        }
+
+        .mobile-menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            z-index: 999;
+        }
+
+        .mobile-menu-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
         .project-info {
             background-color: var(--card-bg);
             border-radius: 0.75rem;
@@ -529,6 +669,22 @@
             .task-id {
                 align-self: flex-start;
             }
+
+            /* Hide desktop header elements on mobile */
+            .language-selector,
+            .theme-toggle {
+                display: none !important;
+            }
+
+            /* Show burger menu on mobile */
+            .burger-menu {
+                display: flex;
+            }
+
+            /* Adjust header layout for mobile */
+            .header-right {
+                gap: 0.5rem;
+            }
         }
 
         .status-badge {
@@ -724,8 +880,57 @@
                         <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
                     </svg>
                 </button>
+                <div class="burger-menu" id="burgerMenu">
+                    <div class="burger-line"></div>
+                    <div class="burger-line"></div>
+                    <div class="burger-line"></div>
+                </div>
             </div>
         </header>
+
+        <!-- Mobile Menu Overlay -->
+        <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
+
+        <!-- Mobile Menu -->
+        <div class="mobile-menu" id="mobileMenu">
+            <div class="mobile-menu-header">
+                <h3 class="mobile-menu-title">Einstellungen</h3>
+                <button class="mobile-menu-close" id="mobileMenuClose">×</button>
+            </div>
+            
+            <div class="mobile-menu-section">
+                <h4 class="mobile-menu-section-title">Sprache</h4>
+                <div class="mobile-menu-item" id="mobileLanguageSelector">
+                    <svg class="mobile-menu-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M2 12h20"></path>
+                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                    </svg>
+                    <span class="mobile-menu-item-text" id="mobileLanguageText">Deutsch</span>
+                    <svg class="mobile-menu-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6,9 12,15 18,9"></polyline>
+                    </svg>
+                </div>
+            </div>
+            
+            <div class="mobile-menu-section">
+                <h4 class="mobile-menu-section-title">Theme</h4>
+                <div class="mobile-menu-item" id="mobileThemeToggle">
+                    <svg class="mobile-menu-item-icon" id="mobileThemeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                    <span class="mobile-menu-item-text" id="mobileThemeText">Dark Mode</span>
+                </div>
+            </div>
+        </div>
 
         <!-- Project Creation Form (shown when no project ID) -->
         <div id="projectFormContainer" class="project-form-container" style="display: none;">
@@ -833,7 +1038,15 @@
                 successTitle: "Projekt erstellt!",
                 successMessage: "Ihr Projekt wurde erfolgreich erstellt. Sie werden in Kürze eine E-Mail mit den Details erhalten.",
                 errorTitle: "Fehler beim Erstellen",
-                errorMessage: "Ein unerwarteter Fehler ist aufgetreten."
+                errorMessage: "Ein unerwarteter Fehler ist aufgetreten.",
+                headerTitle: "Resat Videos",
+                createRequestTitle: "Create Request",
+                titleLabel: "Title",
+                descriptionLabel: "Description",
+                sendRequestButton: "Send Request",
+                myRequestsTitle: "My Requests",
+                creatingTask: "Creating task...",
+                pageTitle: "Resat Videos | Kundenportal"
             },
             tr: {
                 formTitle: "Talep Oluştur",
@@ -847,7 +1060,15 @@
                 successTitle: "Proje Oluşturuldu!",
                 successMessage: "Projeniz başarıyla oluşturuldu. Detayları içeren bir e-posta yakında size gönderilecek.",
                 errorTitle: "Oluşturma Hatası",
-                errorMessage: "Beklenmeyen bir hata oluştu."
+                errorMessage: "Beklenmeyen bir hata oluştu.",
+                headerTitle: "Resat Videos",
+                createRequestTitle: "Create Request",
+                titleLabel: "Title",
+                descriptionLabel: "Description",
+                sendRequestButton: "Send Request",
+                myRequestsTitle: "My Requests",
+                creatingTask: "Creating task...",
+                pageTitle: "Resat Videos | Kundenportal"
             },
             ku: {
                 formTitle: "Daxwaz Çêke",
@@ -861,7 +1082,15 @@
                 successTitle: "Proje Çêkirin!",
                 successMessage: "Projeya we bi serkeftî hat çêkirin. E-nameyek bi detayan dê zû bi we were şandin.",
                 errorTitle: "Çêkirina Çewtiyê",
-                errorMessage: "Çewtiyeke neçêwaz çêbû."
+                errorMessage: "Çewtiyeke neçêwaz çêbû.",
+                headerTitle: "Resat Videos",
+                createRequestTitle: "Create Request",
+                titleLabel: "Title",
+                descriptionLabel: "Description",
+                sendRequestButton: "Send Request",
+                myRequestsTitle: "My Requests",
+                creatingTask: "Creating task...",
+                pageTitle: "Resat Videos | Kundenportal"
             }
         };
 
@@ -883,29 +1112,60 @@
             const messageTextarea = document.getElementById('projectMessage');
             const submitButton = document.querySelector('#projectCreationForm button[type="submit"]');
             
-            if (formTitle && translations[lang]) {
-                formTitle.textContent = translations[lang].formTitle;
+            // Update header title
+            const headerTitle = document.querySelector('.header-center h2');
+            
+            // Update task form
+            const createRequestTitle = document.querySelector('.new-task-form .section-title');
+            const titleLabel = document.querySelector('label[for="taskName"]');
+            const descriptionLabel = document.querySelector('label[for="taskNotes"]');
+            const sendRequestButton = document.querySelector('#taskForm button[type="submit"]');
+            
+            // Update tasks section
+            const myRequestsTitle = document.querySelector('#requestsHeader .section-title');
+            
+            // Update loading modal
+            const loadingModalText = document.querySelector('.loading-modal-text');
+            
+            if (translations[lang]) {
+                // Form translations
+                if (formTitle) formTitle.textContent = translations[lang].formTitle;
+                if (formDescription) formDescription.textContent = translations[lang].formDescription;
+                if (nameLabel) nameLabel.textContent = translations[lang].nameLabel;
+                if (emailLabel) emailLabel.textContent = translations[lang].emailLabel;
+                if (topicLabel) topicLabel.textContent = translations[lang].topicLabel;
+                if (messageLabel) messageLabel.textContent = translations[lang].messageLabel;
+                if (messageTextarea) messageTextarea.placeholder = translations[lang].messagePlaceholder;
+                if (submitButton) submitButton.textContent = translations[lang].submitButton;
+                
+                // Header
+                if (headerTitle) headerTitle.textContent = translations[lang].headerTitle;
+                
+                // Task form
+                if (createRequestTitle) createRequestTitle.textContent = translations[lang].createRequestTitle;
+                if (titleLabel) titleLabel.textContent = translations[lang].titleLabel;
+                if (descriptionLabel) descriptionLabel.textContent = translations[lang].descriptionLabel;
+                if (sendRequestButton) sendRequestButton.textContent = translations[lang].sendRequestButton;
+                
+                // Tasks section
+                if (myRequestsTitle) myRequestsTitle.textContent = translations[lang].myRequestsTitle;
+                
+                // Loading modal
+                if (loadingModalText) loadingModalText.textContent = translations[lang].creatingTask;
+                
+                // Update page title
+                document.title = translations[lang].pageTitle;
             }
-            if (formDescription && translations[lang]) {
-                formDescription.textContent = translations[lang].formDescription;
-            }
-            if (nameLabel && translations[lang]) {
-                nameLabel.textContent = translations[lang].nameLabel;
-            }
-            if (emailLabel && translations[lang]) {
-                emailLabel.textContent = translations[lang].emailLabel;
-            }
-            if (topicLabel && translations[lang]) {
-                topicLabel.textContent = translations[lang].topicLabel;
-            }
-            if (messageLabel && translations[lang]) {
-                messageLabel.textContent = translations[lang].messageLabel;
-            }
-            if (messageTextarea && translations[lang]) {
-                messageTextarea.placeholder = translations[lang].messagePlaceholder;
-            }
-            if (submitButton && translations[lang]) {
-                submitButton.textContent = translations[lang].submitButton;
+            
+            // Update mobile menu language text
+            const mobileLanguageText = document.getElementById('mobileLanguageText');
+            const languageOptions = {
+                de: 'Deutsch',
+                tr: 'Türkçe',
+                ku: 'Kurdî'
+            };
+            if (mobileLanguageText) {
+                mobileLanguageText.textContent = languageOptions[lang] || 'Deutsch';
             }
         }
 
@@ -961,6 +1221,12 @@
                 </svg>`;
                 
                 themeIcon.innerHTML = theme === 'dark' ? sunIcon : moonIcon;
+                
+                // Update mobile menu theme text
+                const mobileThemeText = document.getElementById('mobileThemeText');
+                if (mobileThemeText) {
+                    mobileThemeText.textContent = theme === 'dark' ? 'Light Mode' : 'Dark Mode';
+                }
             }
             
             // Initialize theme
@@ -982,6 +1248,93 @@
             // Handle language change
             languageSelector.addEventListener('change', (e) => {
                 updateLanguage(e.target.value);
+            });
+
+            // Mobile menu functionality
+            const burgerMenu = document.getElementById('burgerMenu');
+            const mobileMenu = document.getElementById('mobileMenu');
+            const mobileMenuOverlay = document.getElementById('mobileMenuOverlay');
+            const mobileMenuClose = document.getElementById('mobileMenuClose');
+            const mobileLanguageSelector = document.getElementById('mobileLanguageSelector');
+            const mobileLanguageText = document.getElementById('mobileLanguageText');
+            const mobileThemeToggle = document.getElementById('mobileThemeToggle');
+            const mobileThemeText = document.getElementById('mobileThemeText');
+            const mobileThemeIcon = document.getElementById('mobileThemeIcon');
+
+            // Language options for mobile menu
+            const languageOptions = {
+                de: 'Deutsch',
+                tr: 'Türkçe',
+                ku: 'Kurdî'
+            };
+
+            // Function to update mobile menu language text
+            function updateMobileLanguageText() {
+                mobileLanguageText.textContent = languageOptions[currentLanguage] || 'Deutsch';
+            }
+
+            // Function to update mobile menu theme text
+            function updateMobileThemeText() {
+                const currentTheme = getCurrentTheme();
+                mobileThemeText.textContent = currentTheme === 'dark' ? 'Light Mode' : 'Dark Mode';
+            }
+
+            // Initialize mobile menu texts
+            updateMobileLanguageText();
+            updateMobileThemeText();
+
+            // Toggle mobile menu
+            function toggleMobileMenu() {
+                const isOpen = mobileMenu.classList.contains('show');
+                
+                if (isOpen) {
+                    closeMobileMenu();
+                } else {
+                    openMobileMenu();
+                }
+            }
+
+            function openMobileMenu() {
+                mobileMenu.classList.add('show');
+                mobileMenuOverlay.classList.add('show');
+                burgerMenu.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeMobileMenu() {
+                mobileMenu.classList.remove('show');
+                mobileMenuOverlay.classList.remove('show');
+                burgerMenu.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+
+            // Event listeners for mobile menu
+            burgerMenu.addEventListener('click', toggleMobileMenu);
+            mobileMenuClose.addEventListener('click', closeMobileMenu);
+            mobileMenuOverlay.addEventListener('click', closeMobileMenu);
+
+            // Mobile language selector
+            mobileLanguageSelector.addEventListener('click', () => {
+                const languages = Object.keys(languageOptions);
+                const currentIndex = languages.indexOf(currentLanguage);
+                const nextIndex = (currentIndex + 1) % languages.length;
+                const newLanguage = languages[nextIndex];
+                
+                updateLanguage(newLanguage);
+                updateMobileLanguageText();
+                
+                // Update desktop language selector if visible
+                if (languageSelector.style.display !== 'none') {
+                    languageSelector.value = newLanguage;
+                }
+            });
+
+            // Mobile theme toggle
+            mobileThemeToggle.addEventListener('click', () => {
+                const currentTheme = getCurrentTheme();
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                updateTheme(newTheme);
+                updateMobileThemeText();
             });
 
             // Get project ID from URL
