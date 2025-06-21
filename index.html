@@ -127,6 +127,11 @@
         .language-selector {
             position: relative;
             margin-right: 1rem;
+            display: none; /* Hidden by default */
+        }
+
+        .language-selector.show {
+            display: block; /* Show when needed */
         }
 
         .language-dropdown {
@@ -995,6 +1000,9 @@
                 document.querySelector('.new-task-form').style.display = 'none';
                 document.querySelector('.tasks-section').style.display = 'none';
                 
+                // Show language selector
+                document.querySelector('.language-selector').classList.add('show');
+                
                 // Handle project creation form
                 const projectCreationForm = document.getElementById('projectCreationForm');
                 const projectFormError = document.getElementById('projectFormError');
@@ -1156,6 +1164,9 @@
                 
                 const project = await response.json();
                 renderProject(project.data);
+                
+                // Hide language selector when project is loaded
+                document.querySelector('.language-selector').classList.remove('show');
                 
             } catch (error) {
                 projectInfoEl.innerHTML = `
