@@ -781,6 +781,26 @@
             const themeToggle = document.getElementById('themeToggle');
             const themeIcon = document.getElementById('themeIcon');
             
+            // Initialize all modal elements first
+            const loadingModal = document.getElementById('loadingModal');
+            const notificationModal = document.getElementById('notificationModal');
+            const notificationIcon = document.getElementById('notificationIcon');
+            const notificationTitle = document.getElementById('notificationTitle');
+            const notificationMessage = document.getElementById('notificationMessage');
+            const notificationButton = document.getElementById('notificationButton');
+            
+            // Set up notification modal event listeners immediately
+            notificationButton.addEventListener('click', () => {
+                notificationModal.classList.remove('show');
+            });
+            
+            // Close modal when clicking outside
+            notificationModal.addEventListener('click', (e) => {
+                if (e.target === notificationModal) {
+                    notificationModal.classList.remove('show');
+                }
+            });
+            
             // Function to get current theme
             function getCurrentTheme() {
                 return localStorage.getItem('theme') || 'light';
@@ -897,19 +917,11 @@
 
             // Handle task form submission
             const taskForm = document.getElementById('taskForm');
-            const loadingModal = document.getElementById('loadingModal');
             
             // Handle collapsible requests section
             const requestsHeader = document.getElementById('requestsHeader');
             const requestsToggle = document.getElementById('requestsToggle');
             const tasksContainer = document.getElementById('tasksContainer');
-            
-            // Handle notification modal
-            const notificationModal = document.getElementById('notificationModal');
-            const notificationIcon = document.getElementById('notificationIcon');
-            const notificationTitle = document.getElementById('notificationTitle');
-            const notificationMessage = document.getElementById('notificationMessage');
-            const notificationButton = document.getElementById('notificationButton');
             
             function showNotification(type, title, message) {
                 notificationIcon.className = `notification-icon ${type}`;
@@ -928,15 +940,6 @@
             function hideNotification() {
                 notificationModal.classList.remove('show');
             }
-            
-            notificationButton.addEventListener('click', hideNotification);
-            
-            // Close modal when clicking outside
-            notificationModal.addEventListener('click', (e) => {
-                if (e.target === notificationModal) {
-                    hideNotification();
-                }
-            });
             
             requestsHeader.addEventListener('click', () => {
                 const isCollapsed = tasksContainer.classList.contains('collapsed');
