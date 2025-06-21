@@ -123,6 +123,38 @@
             transform: scale(1.1);
         }
 
+        /* Language Selector Styles */
+        .language-selector {
+            position: relative;
+            margin-right: 1rem;
+        }
+
+        .language-dropdown {
+            background-color: var(--input-bg);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 0.5rem 2rem 0.5rem 0.75rem;
+            border-radius: 0.5rem;
+            font-size: 0.9rem;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            min-width: 120px;
+        }
+
+        .language-dropdown:hover {
+            border-color: var(--accent);
+        }
+
+        .language-dropdown:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
         .project-info {
             background-color: var(--card-bg);
             border-radius: 0.75rem;
@@ -664,9 +696,16 @@
                 <img src="assets/resat-crm-logo.png" alt="Resat CRM Logo" class="resat-crm-logo">
             </div>
             <div class="header-center">
-                <h2>Mein Projekt</h2>
+                <h2>Resat Videos</h2>
             </div>
             <div class="header-right">
+                <div class="language-selector">
+                    <select class="language-dropdown" id="languageSelector">
+                        <option value="de">Deutsch</option>
+                        <option value="tr">Türkçe</option>
+                        <option value="ku">Kurdî</option>
+                    </select>
+                </div>
                 <button class="theme-toggle" id="themeToggle">
                     <svg class="theme-icon" id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="12" cy="12" r="5"></circle>
@@ -686,11 +725,10 @@
         <!-- Project Creation Form (shown when no project ID) -->
         <div id="projectFormContainer" class="project-form-container" style="display: none;">
             <div class="project-form">
-                <h2 class="form-title">Neues Projekt erstellen</h2>
+                <h2 class="form-title">Anfrage erstellen</h2>
                 <p class="form-description">
-                    Erstellen Sie ein neues Projekt für Ihr Video-Produktionsprojekt. 
-                    Füllen Sie die folgenden Felder aus und wir werden ein entsprechendes Asana-Projekt für Sie anlegen.
-                </p>
+                    Erstellen Sie eine Anfrage für Ihr Video-Produktionsprojekt. 
+                    Füllen Sie die folgenden Felder aus und wir werden Ihnen entsprechend eine Kundenseite per E-Mail zusenden.
                 <form id="projectCreationForm">
                     <div class="form-row">
                         <div class="form-group">
@@ -715,7 +753,7 @@
                         </div>
                     </div>
                     <div style="text-align: center; margin-top: 2rem;">
-                        <button type="submit" class="navy-button">Projekt erstellen</button>
+                        <button type="submit" class="navy-button">Anfrage senden</button>
                     </div>
                     <div id="projectFormError" class="error-message" style="text-align: center; margin-top: 1rem;"></div>
                 </form>
@@ -776,6 +814,96 @@
     </div>
 
     <script>
+        // Translations object
+        const translations = {
+            de: {
+                formTitle: "Anfrage erstellen",
+                formDescription: "Erstellen Sie eine Anfrage für Ihr Video-Produktionsprojekt. Füllen Sie die folgenden Felder aus und wir werden Ihnen entsprechend eine Kundenseite per E-Mail zusenden.",
+                nameLabel: "Name *",
+                emailLabel: "E-Mail *",
+                topicLabel: "Thema *",
+                messageLabel: "Nachricht / Beschreibung",
+                messagePlaceholder: "Beschreiben Sie Ihr Projekt, Anforderungen oder spezielle Wünsche...",
+                submitButton: "Anfrage senden",
+                successTitle: "Projekt erstellt!",
+                successMessage: "Ihr Projekt wurde erfolgreich erstellt. Sie werden in Kürze eine E-Mail mit den Details erhalten.",
+                errorTitle: "Fehler beim Erstellen",
+                errorMessage: "Ein unerwarteter Fehler ist aufgetreten."
+            },
+            tr: {
+                formTitle: "Talep Oluştur",
+                formDescription: "Video prodüksiyon projeniz için bir talep oluşturun. Aşağıdaki alanları doldurun ve size uygun bir müşteri sayfasını e-posta ile göndereceğiz.",
+                nameLabel: "İsim *",
+                emailLabel: "E-posta *",
+                topicLabel: "Konu *",
+                messageLabel: "Mesaj / Açıklama",
+                messagePlaceholder: "Projenizi, gereksinimlerinizi veya özel isteklerinizi açıklayın...",
+                submitButton: "Talebi Gönder",
+                successTitle: "Proje Oluşturuldu!",
+                successMessage: "Projeniz başarıyla oluşturuldu. Detayları içeren bir e-posta yakında size gönderilecek.",
+                errorTitle: "Oluşturma Hatası",
+                errorMessage: "Beklenmeyen bir hata oluştu."
+            },
+            ku: {
+                formTitle: "Daxwaz Çêke",
+                formDescription: "Ji bo projeya we ya hilberîna vîdyoyê daxwazek çêke. Ev qadan tije bike û em ê rûpeleyeke xerîdar bi e-nameyê bişînin.",
+                nameLabel: "Nav *",
+                emailLabel: "E-name *",
+                topicLabel: "Mijar *",
+                messageLabel: "Peyam / Daxuyanî",
+                messagePlaceholder: "Projeya xwe, pêdiviyên we an daxwazên taybetî şirove bike...",
+                submitButton: "Daxwaz Bişîne",
+                successTitle: "Proje Çêkirin!",
+                successMessage: "Projeya we bi serkeftî hat çêkirin. E-nameyek bi detayan dê zû bi we were şandin.",
+                errorTitle: "Çêkirina Çewtiyê",
+                errorMessage: "Çewtiyeke neçêwaz çêbû."
+            }
+        };
+
+        // Current language
+        let currentLanguage = localStorage.getItem('language') || 'de';
+
+        // Function to update language
+        function updateLanguage(lang) {
+            currentLanguage = lang;
+            localStorage.setItem('language', lang);
+            
+            // Update form translations
+            const formTitle = document.querySelector('.form-title');
+            const formDescription = document.querySelector('.form-description');
+            const nameLabel = document.querySelector('label[for="clientName"]');
+            const emailLabel = document.querySelector('label[for="clientEmail"]');
+            const topicLabel = document.querySelector('label[for="projectTopic"]');
+            const messageLabel = document.querySelector('label[for="projectMessage"]');
+            const messageTextarea = document.getElementById('projectMessage');
+            const submitButton = document.querySelector('#projectCreationForm button[type="submit"]');
+            
+            if (formTitle && translations[lang]) {
+                formTitle.textContent = translations[lang].formTitle;
+            }
+            if (formDescription && translations[lang]) {
+                formDescription.textContent = translations[lang].formDescription;
+            }
+            if (nameLabel && translations[lang]) {
+                nameLabel.textContent = translations[lang].nameLabel;
+            }
+            if (emailLabel && translations[lang]) {
+                emailLabel.textContent = translations[lang].emailLabel;
+            }
+            if (topicLabel && translations[lang]) {
+                topicLabel.textContent = translations[lang].topicLabel;
+            }
+            if (messageLabel && translations[lang]) {
+                messageLabel.textContent = translations[lang].messageLabel;
+            }
+            if (messageTextarea && translations[lang]) {
+                messageTextarea.placeholder = translations[lang].messagePlaceholder;
+            }
+            if (submitButton && translations[lang]) {
+                submitButton.textContent = translations[lang].submitButton;
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             // Theme toggle functionality
             const themeToggle = document.getElementById('themeToggle');
@@ -839,6 +967,18 @@
                 updateTheme(newTheme);
             });
 
+            // Language selector functionality
+            const languageSelector = document.getElementById('languageSelector');
+            
+            // Set initial language
+            languageSelector.value = currentLanguage;
+            updateLanguage(currentLanguage);
+            
+            // Handle language change
+            languageSelector.addEventListener('change', (e) => {
+                updateLanguage(e.target.value);
+            });
+
             // Get project ID from URL
             const urlParams = new URLSearchParams(window.location.search);
             let projectGid = urlParams.get('projectGid');
@@ -894,14 +1034,14 @@
                         const project = await response.json();
                         
                         // Show success notification
-                        showNotification('success', 'Projekt erstellt!', 'Ihr Projekt wurde erfolgreich erstellt. Sie werden in Kürze eine E-Mail mit den Details erhalten.');
+                        showNotification('success', translations[currentLanguage].successTitle, translations[currentLanguage].successMessage);
                         
                         // Reset form
                         projectCreationForm.reset();
                         
                     } catch (error) {
                         // Show error notification
-                        showNotification('error', 'Fehler beim Erstellen', error.message || 'Ein unerwarteter Fehler ist aufgetreten.');
+                        showNotification('error', translations[currentLanguage].errorTitle, error.message || translations[currentLanguage].errorMessage);
                     } finally {
                         // Hide loading modal
                         loadingModal.classList.remove('show');
