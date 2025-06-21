@@ -608,6 +608,53 @@
         .notification-button:hover {
             background-color: var(--navy-hover);
         }
+
+        /* Project Creation Form Styles */
+        .project-form-container {
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 2rem;
+        }
+
+        .project-form {
+            background-color: var(--card-bg);
+            border-radius: 0.75rem;
+            padding: 2rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border);
+        }
+
+        .form-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            color: var(--text-primary);
+        }
+
+        .form-description {
+            text-align: center;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-row.full-width {
+            grid-template-columns: 1fr;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
@@ -635,6 +682,45 @@
                 </button>
             </div>
         </header>
+
+        <!-- Project Creation Form (shown when no project ID) -->
+        <div id="projectFormContainer" class="project-form-container" style="display: none;">
+            <div class="project-form">
+                <h2 class="form-title">Neues Projekt erstellen</h2>
+                <p class="form-description">
+                    Erstellen Sie ein neues Projekt für Ihr Video-Produktionsprojekt. 
+                    Füllen Sie die folgenden Felder aus und wir werden ein entsprechendes Asana-Projekt für Sie anlegen.
+                </p>
+                <form id="projectCreationForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="clientName">Name *</label>
+                            <input type="text" id="clientName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="clientEmail">E-Mail *</label>
+                            <input type="email" id="clientEmail" required>
+                        </div>
+                    </div>
+                    <div class="form-row full-width">
+                        <div class="form-group">
+                            <label for="projectTopic">Thema *</label>
+                            <input type="text" id="projectTopic" required>
+                        </div>
+                    </div>
+                    <div class="form-row full-width">
+                        <div class="form-group">
+                            <label for="projectMessage">Nachricht / Beschreibung</label>
+                            <textarea id="projectMessage" rows="4" placeholder="Beschreiben Sie Ihr Projekt, Anforderungen oder spezielle Wünsche..."></textarea>
+                        </div>
+                    </div>
+                    <div style="text-align: center; margin-top: 2rem;">
+                        <button type="submit" class="navy-button">Projekt erstellen</button>
+                    </div>
+                    <div id="projectFormError" class="error-message" style="text-align: center; margin-top: 1rem;"></div>
+                </form>
+            </div>
+        </div>
 
         <div id="projectInfo" class="project-info">
             <div class="loading">
@@ -743,7 +829,65 @@
             }
             
             if (!projectGid) {
-                renderError("No project ID specified. Please add ?projectGid=YOUR_PROJECT_ID to the URL");
+                // Show project creation form instead of error
+                document.getElementById('projectFormContainer').style.display = 'block';
+                document.getElementById('projectInfo').style.display = 'none';
+                document.querySelector('.new-task-form').style.display = 'none';
+                document.querySelector('.tasks-section').style.display = 'none';
+                
+                // Handle project creation form
+                const projectCreationForm = document.getElementById('projectCreationForm');
+                const projectFormError = document.getElementById('projectFormError');
+                
+                projectCreationForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    
+                    const clientName = document.getElementById('clientName').value;
+                    const clientEmail = document.getElementById('clientEmail').value;
+                    const projectTopic = document.getElementById('projectTopic').value;
+                    const projectMessage = document.getElementById('projectMessage').value;
+                    
+                    projectFormError.textContent = '';
+                    
+                    // Show loading modal
+                    loadingModal.classList.add('show');
+                    
+                    try {
+                        const response = await fetch('https://resat-videos-backend.onrender.com/projects', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                name: clientName,
+                                email: clientEmail,
+                                topic: projectTopic,
+                                message: projectMessage
+                            })
+                        });
+                        
+                        if (!response.ok) {
+                            const error = await response.json();
+                            throw new Error(error.error?.message || 'Failed to create project');
+                        }
+                        
+                        const project = await response.json();
+                        
+                        // Show success notification
+                        showNotification('success', 'Projekt erstellt!', 'Ihr Projekt wurde erfolgreich erstellt. Sie werden in Kürze eine E-Mail mit den Details erhalten.');
+                        
+                        // Reset form
+                        projectCreationForm.reset();
+                        
+                    } catch (error) {
+                        // Show error notification
+                        showNotification('error', 'Fehler beim Erstellen', error.message || 'Ein unerwarteter Fehler ist aufgetreten.');
+                    } finally {
+                        // Hide loading modal
+                        loadingModal.classList.remove('show');
+                    }
+                });
+                
                 return;
             }
 
